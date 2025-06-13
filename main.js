@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeContactForm();
     initializeFloatingIcons();
     injectAdditionalStyles();
+    initializeSkillsScroll();
 });
 
 // ===== NAVIGATION FUNCTIONALITY =====
@@ -356,6 +357,38 @@ function throttle(func, limit) {
             setTimeout(() => inThrottle = false, limit);
         }
     }
+}
+
+// ===== SKILLS SCROLL INITIALIZATION =====
+function initializeSkillsScroll() {
+    const skillsRow = document.querySelector('.skills .row:nth-child(2)');
+    const scrollContainer = document.createElement('div');
+    scrollContainer.className = 'skills__scroll-container';
+
+    // Get all skill cards
+    const skillCards = Array.from(skillsRow.children);
+
+    // Move cards to scroll container
+    skillCards.forEach(card => {
+        scrollContainer.appendChild(card);
+    });
+
+    // Clone cards for seamless loop
+    skillCards.forEach(card => {
+        const clone = card.cloneNode(true);
+        scrollContainer.appendChild(clone);
+    });
+
+    // Clear row and append new scroll container
+    skillsRow.innerHTML = '';
+    skillsRow.appendChild(scrollContainer);
+
+    // Reset animation when it completes
+    scrollContainer.addEventListener('animationend', () => {
+        scrollContainer.style.animation = 'none';
+        void scrollContainer.offsetWidth; // Trigger reflow
+        scrollContainer.style.animation = 'scrollSkills 30s linear infinite';
+    });
 }
 
 // ===== INITIALIZE ADDITIONAL FEATURES =====

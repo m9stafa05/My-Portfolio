@@ -21,6 +21,10 @@
     padding-left: 0;
     margin-top: 2rem;
   }
+
+  .skill-card {
+    min-width: 150px;
+  }
 }
 
 @media (max-width: 767px) {
@@ -71,6 +75,10 @@
 
   .footer__social {
     justify-content: center;
+  }
+
+  .skill-card {
+    min-width: 120px;
   }
 }
 
