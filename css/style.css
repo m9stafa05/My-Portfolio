@@ -2,9 +2,9 @@
 :root {
   --color-bg: #0f0f23;
   --color-bg-secondary: #161b33;
-  --color-primary: #00d4aa;
+  --color-primary: #0071d4;
   --color-primary-dark: #00b894;
-  --color-secondary: #6c5ce7;
+  --color-secondary: #305a99;
   --color-accent: #fd79a8;
   --color-white: #ffffff;
   --color-gray-light: #ddd6fe;
@@ -159,7 +159,7 @@ body::before {
   min-height: 100vh;
   display: flex;
   align-items: center;
-  padding: var(--section-padding);
+  /* padding: var(--section-padding); */
   position: relative;
   overflow: hidden;
   animation: heroInfinity 5s linear infinite;
