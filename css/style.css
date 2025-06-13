@@ -79,7 +79,6 @@ body::before {
 
 .navbar.scrolled {
   backdrop-filter: blur(5px);
-
 }
 
 .navbar__brand {
@@ -87,7 +86,13 @@ body::before {
   font-weight: var(--font-weight-bold);
   color: var(--color-white) !important;
   text-decoration: none;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-accent), var(--color-secondary), var(--color-primary));
+  background: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-accent),
+    var(--color-secondary),
+    var(--color-primary)
+  );
   background-size: 300% 300%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -152,6 +157,16 @@ body::before {
 
 .navbar__toggle:focus {
   box-shadow: none;
+}
+
+.navbar-collapse.show,
+.navbar-collapse.collapsing {
+  background: rgba(15, 15, 35, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin: 0 -1rem;
+  padding: 1rem;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
 }
 
 /* ===== HERO SECTION ===== */
