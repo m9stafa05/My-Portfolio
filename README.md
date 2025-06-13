@@ -25,22 +25,6 @@ A sleek, modern personal portfolio website that showcases your professional work
 - Real-time feedback through custom notification system
 - Professional messaging interface
 
-## 🚀 Quick Start
-
-1. **Download the project**
-   ```bash
-   git clone [repository-url]
-   cd portfolio-website
-   ```
-
-2. **Launch the website**
-   - Open `index.html` directly in your browser, or
-   - Use the included `run.bat` for local server setup
-   - Compatible with live server extensions in code editors
-
-3. **View and customize**
-   - Website loads immediately with sample content
-   - Begin customization by editing the main files
 
 ## 📁 Project Structure
 
