@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeProjectFiltering();
     initializeContactForm();
     initializeFloatingIcons();
-    injectAdditionalStyles();
     initializeSkillsScroll();
 });
 
@@ -94,7 +93,14 @@ function initializeScrollAnimations() {
     const observer = new IntersectionObserver(function (entries) {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
+                if (entry.target.classList.contains('skill-card')) {
+                    // Add visible class with staggered delay
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, 100); // Base delay for first card
+                } else {
+                    entry.target.classList.add('visible');
+                }
             }
         });
     }, observerOptions);
@@ -288,61 +294,70 @@ function showNotification(message, type = 'info') {
 function initializeFloatingIcons() {
     const floatingIcons = document.querySelectorAll('.floating-icon');
 
-    floatingIcons.forEach((icon, index) => {
-        // Add mouse interaction
-        icon.addEventListener('mouseenter', function () {
-            this.style.animationPlayState = 'paused';
-            this.style.transform = 'scale(1.2) translateY(-10px)';
-        });
+    floatingIcons.forEach(icon => {
+        const events = {
+            mouseenter: () => {
+                icon.style.animationPlayState = 'paused';
+                icon.style.transform = 'scale(1.2) translateY(-10px)';
+            },
+            mouseleave: () => {
+                icon.style.animationPlayState = 'running';
+                icon.style.transform = '';
+            }
+        };
 
-        icon.addEventListener('mouseleave', function () {
-            this.style.animationPlayState = 'running';
-            this.style.transform = '';
-        });
-
-        // Add click interaction with ripple effect
-        icon.addEventListener('click', function (e) {
-            e.preventDefault();
-
-            // Create ripple effect
-            const ripple = document.createElement('div');
-            ripple.style.cssText = `
-                position: absolute;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.6);
-                transform: scale(0);
-                animation: ripple 0.6s linear;
-                left: 50%;
-                top: 50%;
-                transform-origin: center;
-                pointer-events: none;
-            `;
-
-            const size = 60;
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = ripple.style.top = -size / 2 + 'px';
-
-            this.appendChild(ripple);
-
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
+        Object.entries(events).forEach(([event, handler]) => {
+            icon.addEventListener(event, handler);
         });
     });
 }
 
-// ===== CSS ANIMATIONS (injected via JavaScript) =====
-function injectAdditionalStyles() {
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes ripple {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
+// ===== SKILLS DRAG SCROLL =====
+function initializeSkillsScroll() {
+    const skillsContainer = document.querySelector('.skills__container');
+    const skillCards = document.querySelectorAll('.skill-card');
+
+    // Touch interaction handling
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    skillsContainer.addEventListener('touchstart', (e) => {
+        isDown = true;
+        skillsContainer.style.cursor = 'grabbing';
+        startX = e.touches[0].pageX - skillsContainer.offsetLeft;
+        scrollLeft = skillsContainer.scrollLeft;
+    });
+
+    skillsContainer.addEventListener('touchend', () => {
+        isDown = false;
+        skillsContainer.style.cursor = 'grab';
+    });
+
+    skillsContainer.addEventListener('touchmove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.touches[0].pageX - skillsContainer.offsetLeft;
+        const walk = (x - startX) * 2;
+        skillsContainer.scrollLeft = scrollLeft - walk;
+    });
+
+    // Intersection Observer for fade-in animation
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        },
+        {
+            threshold: 0.1,
+            rootMargin: '0px'
         }
-    `;
-    document.head.appendChild(style);
+    );
+
+    skillCards.forEach((card) => observer.observe(card));
 }
 
 // ===== PERFORMANCE OPTIMIZATION =====
@@ -357,38 +372,6 @@ function throttle(func, limit) {
             setTimeout(() => inThrottle = false, limit);
         }
     }
-}
-
-// ===== SKILLS SCROLL INITIALIZATION =====
-function initializeSkillsScroll() {
-    const skillsRow = document.querySelector('.skills .row:nth-child(2)');
-    const scrollContainer = document.createElement('div');
-    scrollContainer.className = 'skills__scroll-container';
-
-    // Get all skill cards
-    const skillCards = Array.from(skillsRow.children);
-
-    // Move cards to scroll container
-    skillCards.forEach(card => {
-        scrollContainer.appendChild(card);
-    });
-
-    // Clone cards for seamless loop
-    skillCards.forEach(card => {
-        const clone = card.cloneNode(true);
-        scrollContainer.appendChild(clone);
-    });
-
-    // Clear row and append new scroll container
-    skillsRow.innerHTML = '';
-    skillsRow.appendChild(scrollContainer);
-
-    // Reset animation when it completes
-    scrollContainer.addEventListener('animationend', () => {
-        scrollContainer.style.animation = 'none';
-        void scrollContainer.offsetWidth; // Trigger reflow
-        scrollContainer.style.animation = 'scrollSkills 30s linear infinite';
-    });
 }
 
 // ===== INITIALIZE ADDITIONAL FEATURES =====

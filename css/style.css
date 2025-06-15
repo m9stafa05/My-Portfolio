@@ -227,7 +227,7 @@ body::before {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   background-size: 200% 200%;
-  animation: gradientShift 4s ease-in-out infinite, heroTitleTyping 3s steps(30, end) infinite alternate;
+  animation: gradientShift 4s ease-in-out infinite;
   overflow: hidden;
   white-space: nowrap;
   border-right: 3px solid var(--color-primary);
@@ -240,18 +240,6 @@ body::before {
   }
   50% {
     background-position: 100% 50%;
-  }
-}
-
-@keyframes heroTitleTyping {
-  0% {
-    width: 0;
-  }
-  80% {
-    width: 100%;
-  }
-  100% {
-    width: 100%;
   }
 }
 
@@ -533,105 +521,79 @@ body::before {
   z-index: 1;
 }
 
-.skills .row {
+/* Skills Section */
+.skills__container {
   position: relative;
-  overflow: hidden;
-  padding: 2rem 0;
-}
-
-.skills__scroll-container {
   display: flex;
-  animation: scrollSkills 30s linear infinite;
   gap: 2rem;
+  padding: 2rem 0;
+  overflow: hidden;
+  margin: 0 -1rem;
 }
 
-.skills__scroll-container:hover {
+.skills__track {
+  display: flex;
+  gap: 2rem;
+  animation: scrollSkills 30s linear infinite;
+  padding: 1rem;
+}
+
+.skills__track:hover {
   animation-play-state: paused;
-}
-
-@keyframes scrollSkills {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
 }
 
 .skill-card {
-  min-width: 200px; /* Fixed width for smooth scrolling */
-  margin: 0;
-  flex-shrink: 0;
+  flex: 0 0 150px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: var(--border-radius);
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem;
   text-align: center;
-  transition: var(--transition-bounce);
   border: 2px solid transparent;
   backdrop-filter: blur(20px);
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  animation: skillCardBackground 6s ease-in-out infinite;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
 }
 
-@keyframes skillCardBackground {
-  0% {
-    background: rgba(0, 113, 212, 0.1); /* var(--color-primary) */
-  }
-  33% {
-    background: rgba(48, 90, 153, 0.1); /* var(--color-secondary) */
-  }
-  66% {
-    background: rgba(253, 121, 168, 0.1); /* var(--color-accent) */
-  }
-  100% {
-    background: rgba(0, 113, 212, 0.1); /* var(--color-primary) */
-  }
+.skill-card.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .skill-card:hover {
-  animation-play-state: paused;
-  transform: translateY(-15px) scale(1.05);
+  transform: translateY(-10px);
   border-color: var(--color-primary);
   background: rgba(0, 212, 170, 0.1);
   box-shadow: var(--glow);
 }
 
-.skill-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 212, 170, 0.2), transparent);
-  transition: var(--transition-smooth);
+@keyframes scrollSkills {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - 2rem));
+  }
 }
 
-.skill-card:hover::before {
-  left: 100%;
-}
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .skill-card {
+    flex: 0 0 120px;
+    padding: 1rem 0.75rem;
+  }
 
-.skill-card__icon {
-  font-size: 3rem;
-  color: var(--color-primary);
-  margin-bottom: 1rem;
-  position: relative;
-  z-index: 2;
-  transition: var(--transition-bounce);
-}
+  .skills__track {
+    gap: 1rem;
+  }
 
-.skill-card:hover .skill-card__icon {
-  transform: scale(1.2) rotate(5deg);
-  color: var(--color-accent);
-}
+  .skill-card__icon {
+    font-size: 2rem;
+  }
 
-.skill-card__title {
-  font-size: 1.1rem;
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-white);
-  margin: 0;
+  .skill-card__title {
+    font-size: 0.9rem;
+  }
 }
 
 /* ===== PROJECTS SECTION ===== */
@@ -1103,6 +1065,15 @@ body::before {
   color: white;
 }
 
+.notification--error {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.notification--info {
+  background-color: var(--color-gray-medium);
+  color: white;
+}
 .notification--error {
   background-color: var(--color-primary);
   color: white;
