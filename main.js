@@ -449,8 +449,6 @@ form.addEventListener('submit', function (e) {
     const email = document.getElementById('email').value.trim();
     const message = document.getElementById('message').value.trim();
 
-    const botToken = '7713095754:AAFIUS6UJmwVrLPbj9xxJV64p7ecXK1_gh8';
-    const chatId = '5378555770';
 
     const telegramMessage = `
     📬 New Contact Form Message:
