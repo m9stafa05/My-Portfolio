@@ -437,3 +437,49 @@ if (!('scrollBehavior' in document.documentElement.style)) {
         requestAnimationFrame(animation);
     }
 }
+
+// ===== TELEGRAM BOT =====
+const form = document.getElementById('contactForm');
+
+form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const botToken = '7713095754:AAFIUS6UJmwVrLPbj9xxJV64p7ecXK1_gh8';
+    const chatId = '330275788';
+
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const message = document.getElementById('message').value.trim();
+
+    const telegramMessage = `
+📬 New Portfolio Message:
+👤 Name: ${name}
+📧 Email: ${email}
+📝 Message: ${message}
+`;
+
+    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            chat_id: chatId,
+            text: telegramMessage,
+            parse_mode: 'Markdown'
+        })
+    })
+        .then(response => {
+            if (response.ok) {
+                alert('Message sent to Telegram!');
+                form.reset();
+            } else {
+                alert('Failed to send message.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Something went wrong.');
+        });
+});
+// Check if bot filled the hidden field
+const botcheck = form.elements["botcheck"].value;
+if (botcheck) return; // block if bot filled the hidden field
