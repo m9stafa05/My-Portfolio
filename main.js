@@ -440,17 +440,17 @@ if (!('scrollBehavior' in document.documentElement.style)) {
 
 // ===== TELEGRAM BOT =====
 
-    const form = document.getElementById('contactForm');
+const form = document.getElementById('contactForm');
 
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
+form.addEventListener('submit', function (e) {
+    e.preventDefault();
 
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
     const message = document.getElementById('message').value.trim();
 
     const botToken = '7713095754:AAFIUS6UJmwVrLPbj9xxJV64p7ecXK1_gh8';
-        const chatId = '5378555770';
+    const chatId = '5378555770';
 
     const telegramMessage = `
     📬 New Contact Form Message:
@@ -461,23 +461,23 @@ if (!('scrollBehavior' in document.documentElement.style)) {
 
     fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
-    headers: {'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        chat_id: chatId,
-    text: telegramMessage,
-    parse_mode: 'Markdown'
-      })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            chat_id: chatId,
+            text: telegramMessage,
+            parse_mode: 'Markdown'
+        })
     })
-    .then(response => {
-      if (response.ok) {
-        alert('✅ Message sent to Telegram!');
-    form.reset();
-      } else {
-        alert('❌ Failed to send message. Please try again later.');
-      }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    alert('⚠️ An error occurred while sending your message.');
-    });
-  });
+        .then(response => {
+            if (response.ok) {
+                alert('✅ Message sent to Telegram!');
+                form.reset();
+            } else {
+                alert('❌ Failed to send message. Please try again later.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('⚠️ An error occurred while sending your message.');
+        });
+});
