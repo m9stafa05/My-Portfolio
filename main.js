@@ -438,6 +438,8 @@ if (!('scrollBehavior' in document.documentElement.style)) {
     }
 }
 
+
+
 // ===== TELEGRAM BOT =====
 
 const form = document.getElementById('contactForm');
@@ -449,15 +451,16 @@ form.addEventListener('submit', function (e) {
     const email = document.getElementById('email').value.trim();
     const message = document.getElementById('message').value.trim();
 
+    // === Send to Telegram ===
     const botToken = '7713095754:AAFIUS6UJmwVrLPbj9xxJV64p7ecXK1_gh8';
     const chatId = '5378555770';
-    
+
     const telegramMessage = `
-    📬 New Contact Form Message:
-    👤 Name: ${name}
-    📧 Email: ${email}
-    📝 Message: ${message}
-    `;
+📬 New Message
+👤 Name: ${name}
+📧 Email: ${email}
+📝 Message: ${message}
+`;
 
     fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
@@ -470,14 +473,26 @@ form.addEventListener('submit', function (e) {
     })
         .then(response => {
             if (response.ok) {
-                alert('✅ Message sent to Telegram!');
-                form.reset();
+                console.log('✅ Telegram message sent');
             } else {
-                alert('❌ Failed to send message. Please try again later.');
+                console.error('❌ Telegram failed');
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('⚠️ An error occurred while sending your message.');
+            console.error('⚠️ Telegram error:', error);
         });
+
+    // === Send to Email via EmailJS ===
+    emailjs.send('service_9hhey0h', 'template_9j1kdob', {
+        from_name: name,
+        from_email: email,
+        message: message,
+        time: new Date().toLocaleString()
+    }).then(() => {
+        alert('✅ Your message was sent successfully!');
+        form.reset();
+    }, (error) => {
+        console.error('⚠️ EmailJS error:', error);
+        alert('❌ Failed to send email. Please try again.');
+    });
 });
