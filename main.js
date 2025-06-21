@@ -421,8 +421,6 @@ if (!('scrollBehavior' in document.documentElement.style)) {
     }
 }
 
-
-
 // ===== TELEGRAM BOT =====
 
 const form = document.getElementById('contactForm');
@@ -479,3 +477,18 @@ form.addEventListener('submit', function (e) {
         alert('❌ Failed to send email. Please try again.');
     });
 });
+
+// ===== TOP SCROLL PROGRESS BAR =====
+(function () {
+    const bar = document.querySelector('#scroll-progress-top .scroll-progress-bar');
+    if (!bar) return;
+    function updateBar() {
+        const scrollTop = window.scrollY || window.pageYOffset;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const percent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        bar.style.width = percent + '%';
+    }
+    window.addEventListener('scroll', updateBar);
+    window.addEventListener('resize', updateBar);
+    updateBar();
+})();
