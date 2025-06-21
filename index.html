@@ -59,6 +59,7 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
+        <canvas id="hero-bg"></canvas>
         <div class="container">
             <div class="row align-items-center min-vh-100">
                 <div class="col-lg-6 hero__content">
@@ -79,8 +80,8 @@
                     <div class="hero__image-wrapper">
                         <img src="images/profileImage.jpg" alt="Mustafa Elbaz" class="hero__image">
 
-                        <!-- Floating tech icons -->
-                        <div class="floating-icon floating-icon--flutter">
+                        <!-- 3D Orbiting Tech Icons (for JS targeting) -->
+                        <div class="floating-icon floating-icon--flutter" data-icon="flutter">
                             <!-- Flutter SVG -->
                             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100"
                                 viewBox="0 0 48 48">
@@ -92,7 +93,7 @@
                                 <polygon fill="#084994" points="21,39 30,36 27,33"></polygon>
                             </svg>
                         </div>
-                        <div class="floating-icon floating-icon--dart">
+                        <div class="floating-icon floating-icon--dart" data-icon="dart">
                             <!-- Dart SVG -->
                             <svg width="38" height="38" viewBox="0 0 48 48" fill="none">
                                 <polygon points="8,40 8,16 24,8 40,16 40,40 24,48" fill="#0175C2" />
@@ -100,7 +101,7 @@
                                 <polygon points="24,24 40,40 24,48 8,40" fill="#35C5F3" />
                             </svg>
                         </div>
-                        <div class="floating-icon floating-icon--firebase">
+                        <div class="floating-icon floating-icon--firebase" data-icon="firebase">
                             <!-- Firebase SVG -->
                             <svg width="38" height="38" viewBox="0 0 48 48" fill="none">
                                 <polygon points="8,40 24,8 32,24 40,40" fill="#FFA000" />
@@ -108,7 +109,7 @@
                                 <polygon points="8,40 24,32 40,40 24,48" fill="#FFCA28" />
                             </svg>
                         </div>
-                        <div class="floating-icon floating-icon--github">
+                        <div class="floating-icon floating-icon--github" data-icon="github">
                             <i class="fab fa-github"></i>
                         </div>
                     </div>
