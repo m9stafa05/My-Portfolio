@@ -704,3 +704,58 @@ form.addEventListener('submit', function (e) {
         loadScript(THREE_URL).then(startThree);
     }
 })();
+
+// ===== HERO PROFILE FLOAT & ORBITING ICONS ANIMATION =====
+(function () {
+    const wrapper = document.querySelector('.hero__image-wrapper');
+    const profile = wrapper ? wrapper.querySelector('.profile-float-3d') : null;
+    const icons = wrapper ? wrapper.querySelectorAll('.floating-icon') : [];
+    if (!wrapper || !profile || icons.length === 0) return;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let t = 0;
+    let mouse = { x: 0, y: 0 };
+    let target = { x: 0, y: 0 };
+    // Orbit config
+    const orbitRadius = () => Math.min(wrapper.offsetWidth, wrapper.offsetHeight) * 0.48;
+    const iconCount = icons.length;
+    // 3D float config
+    function animate() {
+        if (!prefersReducedMotion) {
+            // Animate profile float/3D
+            const floatX = Math.sin(t * 0.7) * 10 + target.x * 10;
+            const floatY = Math.cos(t * 0.5) * 8 + target.y * 10;
+            const rotY = Math.sin(t * 0.5) * 8 + target.x * 12;
+            const rotX = Math.cos(t * 0.7) * 7 - target.y * 12;
+            profile.style.transform = `translateY(${floatY}px) translateX(${floatX}px) rotateY(${rotY}deg) rotateX(${rotX}deg)`;
+            // Animate icons in orbit
+            icons.forEach((icon, i) => {
+                const angle = t * 0.7 + (i / iconCount) * Math.PI * 2;
+                const r = orbitRadius();
+                const x = Math.cos(angle) * r * 0.85;
+                const y = Math.sin(angle) * r * 0.85;
+                icon.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+            });
+            t += 0.018;
+        }
+        requestAnimationFrame(animate);
+    }
+    // Mouse parallax for 3D effect
+    wrapper.addEventListener('mousemove', e => {
+        const rect = wrapper.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width * 2 - 1;
+        const y = (e.clientY - rect.top) / rect.height * 2 - 1;
+        target.x = x * 0.25;
+        target.y = y * 0.25;
+    });
+    wrapper.addEventListener('mouseleave', () => {
+        target.x = 0;
+        target.y = 0;
+    });
+    // Accessibility: pause animation if prefers-reduced-motion
+    if (prefersReducedMotion) {
+        profile.style.transform = '';
+        icons.forEach(icon => icon.style.transform = '');
+    } else {
+        animate();
+    }
+})();
