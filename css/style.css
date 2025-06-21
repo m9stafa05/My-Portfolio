@@ -1080,3 +1080,35 @@ body::before {
   z-index: 0;
   pointer-events: none;
 }
+
+/* ===== SCROLL PROGRESS BAR ===== */
+#scroll-progress-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 5px;
+  background: transparent;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #0071d4 0%, #d40e00 100%);
+  box-shadow: 0 1px 8px #00d4aa55;
+  border-radius: 0 2px 2px 0;
+  transition: width 0.2s cubic-bezier(0.4, 2, 0.6, 1);
+  will-change: width;
+}
+
+@media (max-width: 767px) {
+  #scroll-progress-top {
+    height: 3px;
+  }
+
+  .scroll-progress-bar {
+    border-radius: 0 1.5px 1.5px 0;
+  }
+}
