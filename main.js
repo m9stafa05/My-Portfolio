@@ -492,3 +492,215 @@ form.addEventListener('submit', function (e) {
     window.addEventListener('resize', updateBar);
     updateBar();
 })();
+
+// ===== HERO 3D BLOB & ICONS (Three.js) =====
+(function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const canvas = document.getElementById('hero-bg');
+    if (!canvas) return;
+
+    // Dynamically load Three.js if not present
+    function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = src;
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+        });
+    }
+
+    const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js';
+    const OrbitControls_URL = 'https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/controls/OrbitControls.min.js';
+
+    function startThree() {
+        // Responsive sizing
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        let dpr = Math.min(window.devicePixelRatio, 2);
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+        camera.position.set(0, 0, 6);
+        scene.add(camera);
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setClearColor(0x000000, 0);
+        renderer.setPixelRatio(dpr);
+        renderer.setSize(width, height, false);
+
+        // Lighting
+        const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambient);
+        const dir = new THREE.DirectionalLight(0xffffff, 0.7);
+        dir.position.set(5, 10, 7);
+        scene.add(dir);
+
+        // 1. Breathing 3D Blob with Avatar Texture
+        const loader = new THREE.TextureLoader();
+        loader.load('images/profileImage.jpg', (avatarTexture) => {
+            const geometry = new THREE.IcosahedronGeometry(1.25, 6);
+            // Vertex shader for breathing effect
+            const vertexShader = `
+                varying vec2 vUv;
+                uniform float uTime;
+                void main() {
+                    vUv = uv;
+                    float b = 0.12 * sin(uTime + position.x * 2.0 + position.y * 2.0 + position.z * 2.0);
+                    vec3 newPosition = position + normal * b;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+                }
+            `;
+            const fragmentShader = `
+                varying vec2 vUv;
+                uniform sampler2D uTexture;
+                void main() {
+                    vec4 tex = texture2D(uTexture, vUv);
+                    if (tex.a < 0.1) discard;
+                    gl_FragColor = tex;
+                }
+            `;
+            const material = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 },
+                    uTexture: { value: avatarTexture }
+                },
+                vertexShader,
+                fragmentShader,
+                transparent: true
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(0, 0, 0);
+            scene.add(mesh);
+
+            // 2. Orbiting Tech Icons (billboarded planes)
+            const iconData = [
+                { key: 'flutter', img: 'images/icons/flutter.png' },
+                { key: 'dart', img: 'images/icons/dart.png' },
+                { key: 'firebase', img: 'images/icons/firebase.png' },
+                { key: 'github', img: 'images/icons/github.png' }
+            ];
+            const iconPlanes = [];
+            const iconCount = iconData.length;
+            const iconRadius = 2.1;
+            iconData.forEach((icon, i) => {
+                loader.load(icon.img, (iconTexture) => {
+                    const planeGeo = new THREE.PlaneGeometry(0.5, 0.5);
+                    const planeMat = new THREE.MeshBasicMaterial({ map: iconTexture, transparent: true });
+                    const plane = new THREE.Mesh(planeGeo, planeMat);
+                    // Place on sphere
+                    const phi = Math.PI / 2 + (i / iconCount) * Math.PI * 2;
+                    const theta = Math.PI / 2 + Math.sin(i) * 0.5;
+                    plane.position.set(
+                        iconRadius * Math.cos(phi) * Math.sin(theta),
+                        iconRadius * Math.sin(phi) * Math.sin(theta),
+                        iconRadius * Math.cos(theta)
+                    );
+                    plane.userData = { key: icon.key, index: i };
+                    scene.add(plane);
+                    iconPlanes.push(plane);
+                });
+            });
+
+            // 3. Interactivity: Parallax, Hover, Gyro
+            let mouse = { x: 0, y: 0 };
+            let targetCamera = { x: 0, y: 0 };
+            let hoverIndex = -1;
+            // Mouse parallax
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = (e.clientX / width) * 2 - 1;
+                mouse.y = -(e.clientY / height) * 2 + 1;
+            });
+            // Gyroscope
+            window.addEventListener('deviceorientation', (e) => {
+                if (e.gamma && e.beta) {
+                    mouse.x = e.gamma / 45;
+                    mouse.y = e.beta / 90;
+                }
+            });
+            // Raycaster for hover
+            const raycaster = new THREE.Raycaster();
+            canvas.addEventListener('pointermove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+                raycaster.setFromCamera({ x, y }, camera);
+                const intersects = raycaster.intersectObjects(iconPlanes);
+                if (intersects.length > 0) {
+                    hoverIndex = iconPlanes.indexOf(intersects[0].object);
+                } else {
+                    hoverIndex = -1;
+                }
+            });
+            canvas.addEventListener('pointerleave', () => { hoverIndex = -1; });
+
+            // 4. Responsiveness
+            window.addEventListener('resize', () => {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                dpr = Math.min(window.devicePixelRatio, 2);
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+                renderer.setPixelRatio(dpr);
+                renderer.setSize(width, height, false);
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+            });
+
+            // 5. Animation Loop
+            let lastTime = performance.now();
+            function animate(now) {
+                const elapsed = (now - lastTime) / 1000;
+                lastTime = now;
+                // Camera parallax
+                targetCamera.x += (mouse.x * 0.5 - targetCamera.x) * 0.08;
+                targetCamera.y += (mouse.y * 0.5 - targetCamera.y) * 0.08;
+                camera.position.x = targetCamera.x;
+                camera.position.y = targetCamera.y;
+                camera.lookAt(0, 0, 0);
+                // Blob breathing
+                material.uniforms.uTime.value = now * 0.001;
+                // Orbit icons
+                iconPlanes.forEach((plane, i) => {
+                    const t = now * 0.0005 + i * (Math.PI * 2 / iconCount);
+                    const r = iconRadius * (hoverIndex === i ? 1.13 : 1);
+                    const phi = t + i;
+                    const theta = Math.PI / 2 + Math.sin(i + now * 0.0003) * 0.5;
+                    plane.position.set(
+                        r * Math.cos(phi) * Math.sin(theta),
+                        r * Math.sin(phi) * Math.sin(theta),
+                        r * Math.cos(theta)
+                    );
+                    // Billboard
+                    plane.lookAt(camera.position);
+                    // Glow/zoom on hover
+                    if (hoverIndex === i) {
+                        plane.material.emissive = new THREE.Color(0x00d4aa);
+                        plane.scale.set(1.25, 1.25, 1);
+                    } else {
+                        plane.material.emissive = undefined;
+                        plane.scale.set(1, 1, 1);
+                    }
+                });
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            animate(performance.now());
+        });
+    }
+
+    // Load Three.js and start
+    if (window.THREE) {
+        startThree();
+    } else {
+        loadScript(THREE_URL).then(startThree);
+    }
+})();
