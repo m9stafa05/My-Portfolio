@@ -610,7 +610,6 @@ body::before {
   z-index: 0;
 }
 
-
 .projects .container {
   position: relative;
   z-index: 1;
@@ -1068,4 +1067,14 @@ body::before {
 .notification--info {
   background-color: var(--color-gray-medium);
   color: white;
+}
+
+#bg-particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
 }
