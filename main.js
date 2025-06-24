@@ -12,6 +12,92 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeSkillsScroll();
 });
 
+// ===== PARTICLES BACKGROUND =====
+const canvas = document.getElementById('bg-particles');
+const ctx = canvas.getContext('2d');
+let width = window.innerWidth;
+let height = window.innerHeight;
+let mouse = { x: width / 2, y: height / 2 };
+const POINTS = 60;
+const DIST = 120;
+const points = [];
+
+function resizeCanvas() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+for (let i = 0; i < POINTS; i++) {
+    points.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.7,
+        vy: (Math.random() - 0.5) * 0.7
+    });
+}
+
+canvas.addEventListener('mousemove', e => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
+
+function draw() {
+    ctx.clearRect(0, 0, width, height);
+    // Draw lines
+    for (let i = 0; i < POINTS; i++) {
+        for (let j = i + 1; j < POINTS; j++) {
+            const dx = points[i].x - points[j].x;
+            const dy = points[i].y - points[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < DIST) {
+                ctx.strokeStyle = 'rgba(0,212,170,' + (1 - dist / DIST) * 0.5 + ')';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(points[i].x, points[i].y);
+                ctx.lineTo(points[j].x, points[j].y);
+                ctx.stroke();
+            }
+        }
+    }
+    // Draw points
+    for (let i = 0; i < POINTS; i++) {
+        ctx.beginPath();
+        ctx.arc(points[i].x, points[i].y, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#00d4aa';
+        ctx.fill();
+    }
+}
+
+function update() {
+    for (let i = 0; i < POINTS; i++) {
+        // Move points
+        points[i].x += points[i].vx;
+        points[i].y += points[i].vy;
+        // Bounce from edges
+        if (points[i].x < 0 || points[i].x > width) points[i].vx *= -1;
+        if (points[i].y < 0 || points[i].y > height) points[i].vy *= -1;
+        // Mouse interaction
+        const dx = points[i].x - mouse.x;
+        const dy = points[i].y - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 100) {
+            points[i].x += dx / dist * 0.7;
+            points[i].y += dy / dist * 0.7;
+        }
+    }
+}
+
+function animate() {
+    update();
+    draw();
+    requestAnimationFrame(animate);
+}
+animate();
+
 // ===== NAVIGATION FUNCTIONALITY =====
 function initializeNavigation() {
     const navbar = document.getElementById('navbar');
